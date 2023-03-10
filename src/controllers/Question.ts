@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 import Question from "../models/Question";
 
 const createQuestion = (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body;
+    const { questionText } = req.body;
     const question = new Question({
         id: new mongoose.Types.ObjectId(),
-        name
+        questionText
     });
     return question
         .save()

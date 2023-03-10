@@ -3,6 +3,9 @@ import http from "http";
 import mongoose from "mongoose";
 import { config } from "./config/config";
 import Logging from "./library/Logging";
+import questionRouts from "./routes/Question";
+import answerRouts from "./routes/Answer";
+import userResult from "./routes/UserResult";
 
 const router = express();
 
@@ -42,6 +45,12 @@ const StartServer = () => {
 
         next();
     });
+
+    router.use("/question", questionRouts);
+
+    router.use("/answer", answerRouts);
+
+    router.use("/userResult", userResult);
 
     /** HEALTHCHECK */
 

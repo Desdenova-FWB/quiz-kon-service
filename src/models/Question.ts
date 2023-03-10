@@ -1,14 +1,15 @@
+import { object } from "joi";
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IQuestion {
-    quiestion: string;
+    questionText: string;
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
 
 const QuestinSchema: Schema = new Schema(
     {
-        name: { type: String, required: true }
+        questionText: { type: String, required: true }
     },
     {
         versionKey: false
