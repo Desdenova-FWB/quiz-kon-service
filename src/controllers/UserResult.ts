@@ -30,6 +30,27 @@ const getUserResults = (req: Request, res: Response, next: NextFunction) => {
         .then((userResults) => res.status(200).json({ userResults }))
         .catch((error) => res.status(500).json({ error }));
 };
+const getSortedUserResults = (req: Request, res: Response, next: NextFunction) => {
+    let { topResults }: { topResults: number } = req.body;
+    UserResult.find()
+        .then((userResults) => {
+            userResults.sort(function (a, b) {
+                if (a.score > b.score) {
+                    return -1;
+                } else if (a.score < b.score) {
+                    return 1;
+                } else {
+                    if (a.time > b.time) return 1;
+                    else if (a.time < b.time) return -1;
+                    else return 0;
+                }
+            });
+            if (topResults && userResults.length > topResults) topResults = userResults.length;
+            const retval = userResults.slice(0, topResults ?? 10);
+            return res.status(200).json({ userResults: retval });
+        })
+        .catch((error) => res.status(500).json({ error }));
+};
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
     const userResultId = req.params.userResultId;
 
@@ -58,4 +79,4 @@ const deleteUserResult = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-export default { createUserResult, getUserResult, getUserResults, updateUserResult, deleteUserResult };
+export default { createUserResult, getUserResult, getUserResults, updateUserResult, deleteUserResult, getSortedUserResults };

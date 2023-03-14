@@ -1,18 +1,28 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import Answer from "../models/Answer";
+import Question from "../models/Question";
 
 const createAnswer = (req: Request, res: Response, next: NextFunction) => {
-    const { answerText, isCorrect, answerId } = req.body;
+    const { answerText, isCorrect, questionId } = req.body;
     const answer = new Answer({
         id: new mongoose.Types.ObjectId(),
         answerText,
         isCorrect,
-        answerId
+        questionId
     });
-    return answer
+
+    answer
         .save()
-        .then((answer) => res.status(201).json({ answer }))
+        .then((answer) => {
+            Question.findById(questionId).then((q) => {
+                if (q) {
+                    q.set({ ...q, answers: [...q.answers, answer] });
+                    q.save();
+                }
+            });
+            res.status(201).json({ answer });
+        })
         .catch((error) => res.status(500).json({ error }));
 };
 
@@ -20,9 +30,11 @@ const getAnswer = (req: Request, res: Response, next: NextFunction) => {
     const answerId = req.params.answerId;
 
     Answer.findById(answerId)
+        .populate("questionId")
         .then((answer) => (answer ? res.status(200).json({ answer }) : res.status(404).json({ message: `answer with id: ${answerId} not found` })))
         .catch((error) => res.status(500).json({ error }));
 };
+
 const getAnswers = (req: Request, res: Response, next: NextFunction) => {
     Answer.find()
         .then((answer) => res.status(200).json({ answer }))
