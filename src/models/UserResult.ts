@@ -15,8 +15,8 @@ const UserResultScheema: Schema = new Schema(
         name: { type: String, required: true },
         email: { type: String, required: true },
         tel: { type: String, required: true },
-        score: { type: Number, required: true },
-        time: { type: Number, required: true }
+        score: { type: Number, required: false },
+        time: { type: Number, required: false }
     },
     {
         timestamps: true,

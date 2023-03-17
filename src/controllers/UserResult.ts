@@ -1,21 +1,24 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
+import Logging from "../library/Logging";
 import UserResult from "../models/UserResult";
 
 const createUserResult = (req: Request, res: Response, next: NextFunction) => {
-    const { name, email, tel, score, time } = req.body;
+    const { name, email, tel } = req.body;
     const userResult = new UserResult({
         id: new mongoose.Types.ObjectId(),
         name,
         email,
         tel,
-        score,
-        time
     });
     return userResult
         .save()
         .then((userResult) => res.status(201).json({ userResult }))
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => {
+            Logging.error(error)
+            return res.status(500).json({ error })
+        }
+            );
 };
 
 const getUserResult = (req: Request, res: Response, next: NextFunction) => {
@@ -27,13 +30,15 @@ const getUserResult = (req: Request, res: Response, next: NextFunction) => {
 };
 const getUserResults = (req: Request, res: Response, next: NextFunction) => {
     UserResult.find()
-        .then((userResults) => res.status(200).json({ userResults }))
-        .catch((error) => res.status(500).json({ error }));
+    .then((userResults) => res.status(200).json({ userResults }))
+    .catch((error) => res.status(500).json({ error }));
 };
 const getSortedUserResults = (req: Request, res: Response, next: NextFunction) => {
     let { topResults }: { topResults: number } = req.body;
+    
     UserResult.find()
         .then((userResults) => {
+            userResults= userResults.filter((result)=> result.score>0)
             userResults.sort(function (a, b) {
                 if (a.score > b.score) {
                     return -1;
@@ -45,8 +50,8 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
                     else return 0;
                 }
             });
-            if (topResults && userResults.length > topResults) topResults = userResults.length;
-            const retval = userResults.slice(0, topResults ?? 10);
+            if (topResults && userResults.length < topResults) topResults = userResults.length;
+            const retval = userResults.splice(0, topResults ?? 10);
             return res.status(200).json({ userResults: retval });
         })
         .catch((error) => res.status(500).json({ error }));

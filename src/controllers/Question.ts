@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import Logging from "../library/Logging";
 import Answer, { IAnswer } from "../models/Answer";
 import Question, { IQuestion, IQuestionModel } from "../models/Question";
 
