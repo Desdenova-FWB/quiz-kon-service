@@ -6,6 +6,7 @@ export interface IUserResult {
     tel: string;
     score: number;
     time: number;
+    tryCounter: number;
 }
 
 export interface IUserResultModel extends IUserResult, Document {}
@@ -16,7 +17,8 @@ const UserResultScheema: Schema = new Schema(
         email: { type: String, required: true },
         tel: { type: String, required: true },
         score: { type: Number, required: false },
-        time: { type: Number, required: false }
+        time: { type: Number, required: false },
+        tryCounter: { type: Number, required: false }
     },
     {
         timestamps: true,

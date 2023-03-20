@@ -3,13 +3,22 @@ import mongoose from "mongoose";
 import Logging from "../library/Logging";
 import UserResult from "../models/UserResult";
 
-const createUserResult = (req: Request, res: Response, next: NextFunction) => {
+const createUserResult = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, tel } = req.body;
+
+   const existingUser = await UserResult.find()
+    .then((userResult) => {return userResult.find(ur => ur.email===email.trim())})
+    .catch((error) => res.status(500).json({ error }));
+    if (existingUser){
+        res.status(201).json({ existingUser })
+    }
+
     const userResult = new UserResult({
         id: new mongoose.Types.ObjectId(),
         name,
-        email,
+        email:email.trim(),
         tel,
+        tryCounter:0
     });
     return userResult
         .save()
@@ -17,8 +26,7 @@ const createUserResult = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => {
             Logging.error(error)
             return res.status(500).json({ error })
-        }
-            );
+        });
 };
 
 const getUserResult = (req: Request, res: Response, next: NextFunction) => {
@@ -58,11 +66,19 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
 };
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
     const userResultId = req.params.userResultId;
-
+    const persisningBody = req.body;
     UserResult.findById(userResultId)
         .then((userResult) => {
             if (userResult) {
-                userResult.set(req.body);
+                let newCounter = userResult.tryCounter++;
+                if (newCounter>1 
+                    && ( userResult.score>persisningBody.score
+                        || (userResult.score==persisningBody.score 
+                            && persisningBody.time<userResult.time))){
+                    persisningBody.score=userResult.score;
+                    persisningBody.time=userResult.time;
+                }
+                persisningBody.tryCounter=newCounter
                 return userResult
                     .save()
                     .then((userResult) => {

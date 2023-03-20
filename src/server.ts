@@ -6,9 +6,10 @@ import Logging from "./library/Logging";
 import questionRouts from "./routes/Question";
 import answerRouts from "./routes/Answer";
 import userResult from "./routes/UserResult";
+var cors = require("cors");
 
 const router = express();
-
+router.use(cors({ origin: "https://konteh.tiaclab.com" }));
 /** Connect to mongo */
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: "majority" })
