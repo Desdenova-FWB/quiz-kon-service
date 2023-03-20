@@ -6,26 +6,28 @@ import UserResult from "../models/UserResult";
 const createUserResult = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, tel } = req.body;
 
-   const existingUser = await UserResult.find()
-    .then((userResult) => {return userResult.find(ur => ur.email===email.trim())})
-    .catch((error) => res.status(500).json({ error }));
-    if (existingUser){
-        res.status(201).json({ existingUser })
+    const existingUser = await UserResult.find()
+        .then((userResult) => {
+            return userResult.find((ur) => ur.email === email.trim());
+        })
+        .catch((error) => res.status(500).json({ error }));
+    if (existingUser) {
+        res.status(201).json({ existingUser });
     }
 
     const userResult = new UserResult({
         id: new mongoose.Types.ObjectId(),
         name,
-        email:email.trim(),
+        email: email.trim(),
         tel,
-        tryCounter:0
+        tryCounter: 0
     });
     return userResult
         .save()
         .then((userResult) => res.status(201).json({ userResult }))
         .catch((error) => {
-            Logging.error(error)
-            return res.status(500).json({ error })
+            Logging.error(error);
+            return res.status(500).json({ error });
         });
 };
 
@@ -38,15 +40,15 @@ const getUserResult = (req: Request, res: Response, next: NextFunction) => {
 };
 const getUserResults = (req: Request, res: Response, next: NextFunction) => {
     UserResult.find()
-    .then((userResults) => res.status(200).json({ userResults }))
-    .catch((error) => res.status(500).json({ error }));
+        .then((userResults) => res.status(200).json({ userResults }))
+        .catch((error) => res.status(500).json({ error }));
 };
 const getSortedUserResults = (req: Request, res: Response, next: NextFunction) => {
     let { topResults }: { topResults: number } = req.body;
-    
+
     UserResult.find()
         .then((userResults) => {
-            userResults= userResults.filter((result)=> result.score>0)
+            userResults = userResults.filter((result) => result.score > 0);
             userResults.sort(function (a, b) {
                 if (a.score > b.score) {
                     return -1;
@@ -65,20 +67,17 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
         .catch((error) => res.status(500).json({ error }));
 };
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
-    const userResultId = req.params.userResultId;
+    const userResultId = req.body._id;
     const persisningBody = req.body;
     UserResult.findById(userResultId)
         .then((userResult) => {
             if (userResult) {
                 let newCounter = userResult.tryCounter++;
-                if (newCounter>1 
-                    && ( userResult.score>persisningBody.score
-                        || (userResult.score==persisningBody.score 
-                            && persisningBody.time<userResult.time))){
-                    persisningBody.score=userResult.score;
-                    persisningBody.time=userResult.time;
+                if (newCounter > 1 && (userResult.score > persisningBody.score || (userResult.score == persisningBody.score && persisningBody.time < userResult.time))) {
+                    persisningBody.score = userResult.score;
+                    persisningBody.time = userResult.time;
                 }
-                persisningBody.tryCounter=newCounter
+                persisningBody.tryCounter = newCounter;
                 return userResult
                     .save()
                     .then((userResult) => {

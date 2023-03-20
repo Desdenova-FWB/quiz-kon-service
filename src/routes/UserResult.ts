@@ -11,7 +11,7 @@ router.get("/get", controller.getUserResults);
 
 router.post("/getSortedUserResults", controller.getSortedUserResults);
 
-router.patch("/update/:userResultId", controller.updateUserResult);
+router.patch("/update", controller.updateUserResult);
 
 router.delete("/delete/:userResultId", controller.deleteUserResult);
 
