@@ -11,13 +11,12 @@ var cors = require("cors");
 const router = express();
 // router.use(cors({ origin: "https://kontehbe.tiaclab.com/" }));
 
-router.use(cors({ origin: "*" }));
 /** Connect to mongo */
 mongoose
-    .connect(config.mongo.url, { retryWrites: true, w: "majority" })
-    .then(() => {
-        Logging.info(`Connected to mongo-db`);
-        StartServer();
+.connect(config.mongo.url, { retryWrites: true, w: "majority" })
+.then(() => {
+    Logging.info(`Connected to mongo-db`);
+    StartServer();
     })
     .catch((error) => {
         Logging.info(`UNABLE to connected to mongo-db`);
@@ -25,6 +24,7 @@ mongoose
     });
 /** start only if db connects  */
 const StartServer = () => {
+    router.use(cors({ origin: "*" }));
     router.use((req, res, next) => {
         Logging.info(`Incomming - METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
 

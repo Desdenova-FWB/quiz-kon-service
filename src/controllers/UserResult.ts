@@ -10,7 +10,7 @@ const createUserResult = async (req: Request, res: Response, next: NextFunction)
         .then((userResult) => {
             const retval = userResult.find((ur) => ur.email === email.trim());
             if(retval){
-                return res.status(201).json({ retval });
+                return res.status(201).json(retval);
             }  
             
             const newUser = new UserResult({
@@ -23,7 +23,7 @@ const createUserResult = async (req: Request, res: Response, next: NextFunction)
         
                 return newUser
                 .save()
-                .then((retval) => res.status(201).json({ retval }))
+                .then((retval) => res.status(201).json(retval ))
                 .catch((error) => {
                     Logging.error(error);
                     return res.status(500).json({ error });
@@ -68,12 +68,12 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
         .catch((error) => res.status(500).json({ error }));
 };
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
+    Logging.warning(JSON.stringify(req.body))
     UserResult.findById(req.body._id)
     .then((userResult) => {
-        
         if (userResult) {
                 const persisningBody = {...userResult};
-                let newCounter = userResult.tryCounter+1;
+                let newCounter = (userResult.tryCounter===undefined || userResult.tryCounter===null?0:userResult.tryCounter  )+ 1;
                 if (newCounter > 1   && ( !userResult.score || userResult.score < req.body.score ||  (userResult.score == req.body.score && userResult.time > req.body.time ))) {
                     Logging.warning("entered")
                     persisningBody.score= req.body.score;
