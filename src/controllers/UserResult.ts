@@ -68,7 +68,7 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
         .catch((error) => res.status(500).json({ error }));
 };
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
-    Logging.warning(JSON.stringify(req.body))
+    Logging.warning("IS THIS TEXT LOGGED ??????????")
     UserResult.findById(req.body._id)
     .then((userResult) => {
         if (userResult) {
