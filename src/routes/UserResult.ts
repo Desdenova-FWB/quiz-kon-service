@@ -11,7 +11,7 @@ router.get("/get", controller.getUserResults);
 
 router.post("/getSortedUserResults", controller.getSortedUserResults);
 
-router.post("/update", controller.updateUserResult);
+router.patch("/update", controller.updateUserResult);
 
 router.post("/edit", controller.editUser);
 
