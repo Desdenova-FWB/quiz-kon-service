@@ -74,7 +74,7 @@ const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
         if (userResult) {
                 const persisningBody = {...userResult};
                 let newCounter = (userResult.tryCounter===undefined || userResult.tryCounter===null?0:userResult.tryCounter  )+ 1;
-                if (newCounter > 1   && ( !userResult.score || userResult.score < req.body.score ||  (userResult.score == req.body.score && userResult.time > req.body.time ))) {
+                if (newCounter >= 1   && ( !userResult.score || userResult.score < req.body.score ||  (userResult.score == req.body.score && userResult.time > req.body.time ))) {
                     Logging.warning("entered")
                     persisningBody.score= req.body.score;
                     persisningBody.time = req.body.time
@@ -97,36 +97,6 @@ const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-const editUser = (req: Request, res: Response, next: NextFunction) => {
-    Logging.warning("IS THIS TEXT LOGGED ??????????")
-    res.status(500).json({ message:"got here" })
-    // UserResult.findById(req.body._id)
-    // .then((userResult) => {
-    //     if (userResult) {
-    //             const persisningBody = {...userResult};
-    //             let newCounter = (userResult.tryCounter===undefined || userResult.tryCounter===null?0:userResult.tryCounter  )+ 1;
-    //             if (newCounter > 1   && ( !userResult.score || userResult.score < req.body.score ||  (userResult.score == req.body.score && userResult.time > req.body.time ))) {
-    //                 Logging.warning("entered")
-    //                 persisningBody.score= req.body.score;
-    //                 persisningBody.time = req.body.time
-    //             }
-    //             Logging.error(userResult.tryCounter)
-    //             Logging.error(newCounter)
-    //             persisningBody.tryCounter = newCounter;
-    //             return userResult
-    //                 .set({...persisningBody})
-    //                 .save()
-    //                 .then((userResult) => {
-    //                     Logging.warning(JSON.stringify(userResult))
-    //                     res.status(200).json({ userResult });}
-    //                     )
-    //                 .catch((error) => res.status(500).json({ error }));
-    //         } else {
-    //             res.status(404).json({ message: `userResult with id: ${req.body._id} not found` });
-    //         }
-    //     })
-    //     .catch((error) => res.status(500).json({ error }));
-};
 const deleteUserResult = (req: Request, res: Response, next: NextFunction) => {
     const userResultId = req.params.userResultId;
     UserResult.findByIdAndDelete(userResultId)
@@ -136,4 +106,14 @@ const deleteUserResult = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-export default { createUserResult, getUserResult, getUserResults,editUser, updateUserResult, deleteUserResult, getSortedUserResults };
+
+const deleteAllSudo = (req: Request, res: Response, next: NextFunction) => {
+    const userResultId = req.params.userResultId;
+    UserResult.deleteMany()
+    .then(() => res.status(200).json({ message: `nuk 'em all` })
+)
+    .catch((error) => res.status(500).json({ error }));
+    
+};
+
+export default { createUserResult, getUserResult, getUserResults, updateUserResult, deleteUserResult, getSortedUserResults,deleteAllSudo };
