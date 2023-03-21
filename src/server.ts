@@ -9,7 +9,7 @@ import userResult from "./routes/UserResult";
 var cors = require("cors");
 
 const router = express();
-router.use(cors({ origin: "*" }));
+router.use(cors({ origin: "https://kontehbe.tiaclab.com/" }));
 /** Connect to mongo */
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: "majority" })

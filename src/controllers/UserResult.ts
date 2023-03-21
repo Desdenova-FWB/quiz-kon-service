@@ -5,30 +5,31 @@ import UserResult from "../models/UserResult";
 
 const createUserResult = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, tel } = req.body;
-
-    const existingUser = await UserResult.find()
+    let ret ={};
+    await UserResult.find()
         .then((userResult) => {
-            return userResult.find((ur) => ur.email === email.trim());
+            const retval = userResult.find((ur) => ur.email === email.trim());
+            if(retval){
+                return res.status(201).json({ retval });
+            }  
+            
+            const newUser = new UserResult({
+                id: new mongoose.Types.ObjectId(),
+                name,
+                email: email.trim(),
+                tel,
+                tryCounter: 0
+            });
+        
+                return newUser
+                .save()
+                .then((retval) => res.status(201).json({ retval }))
+                .catch((error) => {
+                    Logging.error(error);
+                    return res.status(500).json({ error });
+                });
         })
         .catch((error) => res.status(500).json({ error }));
-    if (existingUser) {
-        res.status(201).json({ existingUser });
-    }
-
-    const userResult = new UserResult({
-        id: new mongoose.Types.ObjectId(),
-        name,
-        email: email.trim(),
-        tel,
-        tryCounter: 0
-    });
-    return userResult
-        .save()
-        .then((userResult) => res.status(201).json({ userResult }))
-        .catch((error) => {
-            Logging.error(error);
-            return res.status(500).json({ error });
-        });
 };
 
 const getUserResult = (req: Request, res: Response, next: NextFunction) => {
@@ -67,25 +68,30 @@ const getSortedUserResults = (req: Request, res: Response, next: NextFunction) =
         .catch((error) => res.status(500).json({ error }));
 };
 const updateUserResult = (req: Request, res: Response, next: NextFunction) => {
-    const userResultId = req.body._id;
-    const persisningBody = req.body;
-    UserResult.findById(userResultId)
-        .then((userResult) => {
-            if (userResult) {
-                let newCounter = userResult.tryCounter++;
-                if (newCounter > 1 && (userResult.score > persisningBody.score || (userResult.score == persisningBody.score && persisningBody.time < userResult.time))) {
-                    persisningBody.score = userResult.score;
-                    persisningBody.time = userResult.time;
+    UserResult.findById(req.body._id)
+    .then((userResult) => {
+        
+        if (userResult) {
+                const persisningBody = {...userResult};
+                let newCounter = userResult.tryCounter+1;
+                if (newCounter > 1   && ( !userResult.score || userResult.score < req.body.score ||  (userResult.score == req.body.score && userResult.time > req.body.time ))) {
+                    Logging.warning("entered")
+                    persisningBody.score= req.body.score;
+                    persisningBody.time = req.body.time
                 }
+                Logging.error(userResult.tryCounter)
+                Logging.error(newCounter)
                 persisningBody.tryCounter = newCounter;
                 return userResult
+                    .set({...persisningBody})
                     .save()
                     .then((userResult) => {
-                        res.status(200).json({ userResult });
-                    })
+                        Logging.warning(JSON.stringify(userResult))
+                        res.status(200).json({ userResult });}
+                        )
                     .catch((error) => res.status(500).json({ error }));
             } else {
-                res.status(404).json({ message: `userResult with id: ${userResultId} not found` });
+                res.status(404).json({ message: `userResult with id: ${req.body._id} not found` });
             }
         })
         .catch((error) => res.status(500).json({ error }));
