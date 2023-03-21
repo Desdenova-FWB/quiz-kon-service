@@ -13,6 +13,8 @@ router.post("/getSortedUserResults", controller.getSortedUserResults);
 
 router.post("/update", controller.updateUserResult);
 
+router.post("/edit", controller.editUser);
+
 router.delete("/delete/:userResultId", controller.deleteUserResult);
 
 export default router;
