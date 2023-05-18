@@ -10,9 +10,8 @@ const createUserResult = async (req: Request, res: Response, next: NextFunction)
         .then((userResult) => {
             const retval = userResult.find((ur) => ur.email === email.trim());
             if(retval){
-                return res.status(201).json(retval);
+                return res.status(403).json("Ne možete igrati više puta.");
             }  
-            
             const newUser = new UserResult({
                 id: new mongoose.Types.ObjectId(),
                 name,
@@ -23,7 +22,7 @@ const createUserResult = async (req: Request, res: Response, next: NextFunction)
         
                 return newUser
                 .save()
-                .then((retval) => res.status(201).json(retval ))
+                .then((retval) => res.status(201).json(retval))
                 .catch((error) => {
                     Logging.error(error);
                     return res.status(500).json({ error });
