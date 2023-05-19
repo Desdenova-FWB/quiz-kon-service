@@ -98,4 +98,10 @@ const deleteQestion = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-export default { createQuestion, getQuestion, getQuestions, updateQestion, deleteQestion, getRandomQuestions, createQuestionWithAnswers };
+const deleteAllSudo = (req: Request, res: Response, next: NextFunction) => {
+    Question.deleteMany()
+        .then(() => res.status(200).json({ message: `nuk 'em all` }))
+        .catch((error) => res.status(500).json({ error }));
+};
+
+export default { createQuestion, getQuestion, getQuestions, updateQestion, deleteQestion, deleteAllSudo, getRandomQuestions, createQuestionWithAnswers };

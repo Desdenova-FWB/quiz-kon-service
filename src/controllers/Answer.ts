@@ -66,4 +66,10 @@ const deleteAnswer = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-export default { createAnswer, getAnswer, getAnswers, updateAnswer, deleteAnswer };
+const deleteAllSudo = (req: Request, res: Response, next: NextFunction) => {
+    Answer.deleteMany()
+        .then(() => res.status(200).json({ message: `nuk 'em all` }))
+        .catch((error) => res.status(500).json({ error }));
+};
+
+export default { createAnswer, getAnswer, getAnswers, updateAnswer, deleteAllSudo, deleteAnswer };
