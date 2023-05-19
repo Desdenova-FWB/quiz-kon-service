@@ -13,6 +13,6 @@ router.patch("/update/:answerId", controller.updateAnswer);
 
 router.delete("/delete/:answerId", controller.deleteAnswer);
 
-router.delete("/deleteAllSudo", controller.deleteAllSudo);
+//router.delete("/deleteAllSudo", controller.deleteAllSudo);
 
 export default router;

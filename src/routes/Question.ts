@@ -17,6 +17,6 @@ router.patch("/update/:questionId", controller.updateQestion);
 
 router.delete("/delete/:questionId", controller.deleteQestion);
 
-router.delete("/deleteAllSudo", controller.deleteAllSudo);
+//router.delete("/deleteAllSudo", controller.deleteAllSudo);
 
 export default router;

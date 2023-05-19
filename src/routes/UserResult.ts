@@ -15,6 +15,6 @@ router.patch("/update", controller.updateUserResult);
 
 router.delete("/delete/:userResultId", controller.deleteUserResult);
 
-router.delete("/deleteAllSudo", controller.deleteAllSudo);
+//router.delete("/deleteAllSudo", controller.deleteAllSudo);
 
 export default router;
